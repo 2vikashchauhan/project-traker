@@ -5,7 +5,7 @@ import { NotFoundError, TransitionError } from "@/lib/errors";
 import { Project, ProjectWithTasks } from "@/types/project.types";
 
 // Create a mock repository
-function createMockRepository(): jest.Mocked<ProjectRepository> {
+function createMockRepository() {
   return {
     findAll: vi.fn(),
     findById: vi.fn(),
@@ -15,7 +15,9 @@ function createMockRepository(): jest.Mocked<ProjectRepository> {
     countByStatus: vi.fn(),
     countAll: vi.fn(),
     getAverageProgress: vi.fn(),
-  } as unknown as jest.Mocked<ProjectRepository>;
+  } as unknown as {
+    [K in keyof ProjectRepository]: ReturnType<typeof vi.fn>;
+  };
 }
 
 const baseProject: Project = {
@@ -27,6 +29,7 @@ const baseProject: Project = {
   startDate: "2024-01-01T00:00:00.000Z",
   dueDate: "2024-06-01T00:00:00.000Z",
   progress: 0,
+  ownerId: null,
   createdAt: "2024-01-01T00:00:00.000Z",
   updatedAt: "2024-01-01T00:00:00.000Z",
 };
@@ -107,6 +110,7 @@ describe("ProjectService", () => {
         dueDate: "2024-06-01",
         status: "Planned",
         progress: 0,
+        ownerId: null,
       });
       expect(result).toEqual(created);
     });

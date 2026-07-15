@@ -103,7 +103,7 @@ describe("Property 13: Overdue Task Identification", () => {
         expect(overdueByDate).toBe(true);
 
         // Since status !== "Done", the full overdue condition is true
-        const isTaskOverdue = overdueByDate && status !== "Done";
+        const isTaskOverdue = overdueByDate && (status as string) !== "Done";
         expect(isTaskOverdue).toBe(true);
       }),
       { numRuns: 200 }

@@ -195,6 +195,61 @@ This document records the prompts and interactions used during the spec-driven d
 
 ---
 
+## Prompt 13: Database Viewing Commands
+
+**Date:** July 14, 2026  
+**Type:** Reference / Documentation
+
+**Prompt:**
+
+> Provide the exact commands to view the data using Prisma Studio and psql (PostgreSQL CLI). Show SQL queries to list all tables, view all projects, view all tasks, count projects, and count tasks.
+
+**Outcome:** Provided commands and queries for database inspection:
+- **Prisma Studio:** `npx prisma studio` (opens GUI at localhost:5555)
+- **psql:** `PGPASSWORD=password psql -h localhost -p 5432 -U user -d project_tracker`
+- **SQL queries:** `SELECT * FROM projects`, `SELECT * FROM tasks`, `SELECT COUNT(*) FROM projects`, `SELECT COUNT(*) FROM tasks`, plus bonus queries for joins, overdue tasks, and progress summaries.
+
+---
+
+## Prompt 14: Auth System Quick Spec
+
+**Date:** July 15, 2026  
+**Type:** Feature Spec (Quick Spec)
+
+**Prompt:**
+
+> Add a complete Authentication and Authorization system in project tracker application
+
+**Outcome:** Generated a full auth-system spec via Quick Spec workflow (clarify → requirements → design → tasks → review). Created three spec files at `.kiro/specs/auth-system/`:
+- **requirements.md** — 11 requirements covering user registration, login (NextAuth.js v5 credentials provider), JWT session management, backend/frontend route protection, RBAC (Admin/Manager/Member), user profile, database schema (User model + Role enum + relations), login/register pages, security practices, and admin user management.
+- **design.md** — Architecture integration with existing layers, NextAuth.js config, Prisma schema changes (nullable ownerId/createdById for backward compatibility), API design, Next.js middleware strategy, withAuth/withRole HOFs, frontend SessionProvider + AuthGuard, permissions module, 15 correctness properties.
+- **tasks.md** — 16 task groups (~35 subtasks + 8 optional tests) in 15 dependency waves. Ready for execution.
+
+---
+
+## Prompt 15: Auth System Task Execution
+
+**Date:** July 15, 2026  
+**Type:** Implementation (Full Task Execution)
+
+**Prompt:**
+
+> Run all tasks for this spec.
+
+**Outcome:** Executed all 52 tasks (36 leaf tasks + 16 parent/checkpoint tasks) from the auth-system spec across 14 dependency waves. Delivered:
+- **Dependencies & setup:** next-auth@5, bcryptjs, type augmentations, ForbiddenError/UnauthorizedError classes
+- **Database:** Prisma migration adding User model, Role enum (Admin/Manager/Member), ownerId on Project, createdById on Task
+- **Repository & validators:** UserRepository (password exclusion from reads), Zod schemas (register, login, profile, role change)
+- **Services:** AuthService (registration with bcrypt, duplicate email detection), UserService (profile CRUD, admin role management with self-change prevention)
+- **Auth config:** NextAuth.js v5 with credentials provider, JWT strategy, callbacks embedding id/role
+- **Auth helpers:** withAuth/withRole HOFs composing with withErrorHandling, canPerformAction RBAC module
+- **Middleware:** Next.js edge middleware for route protection (public/protected path routing)
+- **API routes:** POST /api/auth/register, GET/PATCH /api/users/me, GET /api/admin/users, PATCH /api/admin/users/[id], auth wrappers on existing project/task/dashboard routes with ownership checks
+- **Frontend:** SessionProvider integration, AuthGuard component, login page, registration page (with confirmPassword validation), auth layout (no AppShell), protected layout (AuthGuard + AppShell), page restructuring into (protected) route group, Header with user avatar/menu/logout, admin users management page
+- **Testing:** 590 tests passing — unit tests, integration tests (auth, admin, RBAC), and property-based tests (14 correctness properties verified with fast-check, 100+ runs each)
+
+---
+
 ## Summary
 
 | Step | Action | Output |
@@ -212,6 +267,9 @@ This document records the prompts and interactions used during the spec-driven d
 | 11 | PostgreSQL local setup | Manual setup commands + .env fix for Prisma CLI |
 | 12 | Automatic prompt history updates | Auto-update hook created (.kiro/hooks) |
 | 13 | Optimize .gitignore | Comprehensive gitignore for Next.js + Prisma project |
+| 14 | Database viewing commands | Prisma Studio + psql + SQL queries reference |
+| 15 | Auth system Quick Spec | requirements.md + design.md + tasks.md for auth-system |
+| 16 | Auth system task execution | Full auth implementation (590 tests passing) |
 
 ---
 
@@ -221,6 +279,7 @@ This document records the prompts and interactions used during the spec-driven d
 - [x] Review and approve design.md
 - [x] Generate tasks.md (implementation task list)
 - [x] Implement all tasks
+- [x] Execute all auth-system spec tasks
 - [ ] Install and start PostgreSQL locally
 - [ ] Run `npx prisma migrate deploy` to create tables
 - [ ] Run `npm run dev` and verify the dashboard loads without errors

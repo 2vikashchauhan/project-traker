@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-handler";
+import { withAuth, AuthenticatedRequest } from "@/lib/auth-helpers";
 import { taskService } from "@/services/task.service";
 import { createTaskSchema } from "@/validators/task.validator";
 import { taskQueryParamsSchema } from "@/validators/common.validator";
@@ -8,8 +9,9 @@ import { ValidationError } from "@/lib/errors";
 /**
  * GET /api/tasks
  * Lists tasks with optional search, status filter, priority filter, and sort.
+ * Requires authentication.
  */
-export const GET = withErrorHandling(async (req: NextRequest) => {
+export const GET = withErrorHandling(withAuth(async (req: AuthenticatedRequest) => {
   const { searchParams } = new URL(req.url);
   const rawParams: Record<string, string> = {};
 
@@ -28,13 +30,14 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
   const tasks = await taskService.listTasks(parsed.data);
   return NextResponse.json(tasks);
-});
+}));
 
 /**
  * POST /api/tasks
  * Creates a new task. Returns 201 on success.
+ * Requires authentication. Sets createdById to current user.
  */
-export const POST = withErrorHandling(async (req: NextRequest) => {
+export const POST = withErrorHandling(withAuth(async (req: AuthenticatedRequest) => {
   let body: unknown;
   try {
     body = await req.json();
@@ -55,6 +58,9 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     throw new ValidationError("Validation failed", fieldErrors);
   }
 
-  const task = await taskService.createTask(parsed.data);
+  const task = await taskService.createTask({
+    ...parsed.data,
+    createdById: req.user.id,
+  });
   return NextResponse.json(task, { status: 201 });
-});
+}));

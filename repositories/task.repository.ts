@@ -70,6 +70,7 @@ function mapToTask(record: {
   dueDate: Date | null;
   assignedTo: string | null;
   projectId: string;
+  createdById: string | null;
   createdAt: Date;
   updatedAt: Date;
 }): Task {
@@ -82,6 +83,7 @@ function mapToTask(record: {
     dueDate: record.dueDate ? record.dueDate.toISOString() : null,
     assignedTo: record.assignedTo,
     projectId: record.projectId,
+    createdById: record.createdById,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
   };
@@ -99,6 +101,7 @@ function mapToTaskWithProject(record: {
   dueDate: Date | null;
   assignedTo: string | null;
   projectId: string;
+  createdById: string | null;
   createdAt: Date;
   updatedAt: Date;
   project: {
@@ -110,6 +113,7 @@ function mapToTaskWithProject(record: {
     startDate: Date | null;
     dueDate: Date | null;
     progress: number;
+    ownerId: string | null;
     createdAt: Date;
     updatedAt: Date;
   };
@@ -133,6 +137,7 @@ function mapToTaskWithProject(record: {
       startDate: record.project.startDate ? record.project.startDate.toISOString() : null,
       dueDate: record.project.dueDate ? record.project.dueDate.toISOString() : null,
       progress: record.project.progress,
+      ownerId: record.project.ownerId,
       createdAt: record.project.createdAt.toISOString(),
       updatedAt: record.project.updatedAt.toISOString(),
     },
@@ -227,6 +232,7 @@ export class TaskRepository {
         dueDate: data.dueDate ? new Date(data.dueDate) : null,
         assignedTo: data.assignedTo ?? null,
         projectId: data.projectId,
+        createdById: data.createdById ?? null,
       },
     });
 

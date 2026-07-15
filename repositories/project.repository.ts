@@ -73,6 +73,7 @@ export interface ProjectCreateData {
   startDate?: string | null;
   dueDate?: string | null;
   progress?: number;
+  ownerId?: string | null;
 }
 
 /**
@@ -100,6 +101,7 @@ function mapProject(record: {
   startDate: Date | null;
   dueDate: Date | null;
   progress: number;
+  ownerId: string | null;
   createdAt: Date;
   updatedAt: Date;
 }): Project {
@@ -112,6 +114,7 @@ function mapProject(record: {
     startDate: record.startDate ? record.startDate.toISOString() : null,
     dueDate: record.dueDate ? record.dueDate.toISOString() : null,
     progress: record.progress,
+    ownerId: record.ownerId,
     createdAt: record.createdAt.toISOString(),
     updatedAt: record.updatedAt.toISOString(),
   };
@@ -243,6 +246,10 @@ export class ProjectRepository {
       dueDate: data.dueDate ? new Date(data.dueDate) : null,
       progress: data.progress ?? 0,
     };
+
+    if (data.ownerId) {
+      createData.owner = { connect: { id: data.ownerId } };
+    }
 
     const record = await prisma.project.create({ data: createData });
     return mapProject(record);

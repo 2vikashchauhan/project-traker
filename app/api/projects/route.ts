@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-handler";
+import { withAuth, AuthenticatedRequest } from "@/lib/auth-helpers";
 import { projectService } from "@/services/project.service";
 import { createProjectSchema } from "@/validators/project.validator";
 import { projectQueryParamsSchema } from "@/validators/common.validator";
@@ -8,8 +9,9 @@ import { ValidationError } from "@/lib/errors";
 /**
  * GET /api/projects
  * Lists projects with optional search, status/priority filter, and sort.
+ * Requires authentication.
  */
-export const GET = withErrorHandling(async (req: NextRequest) => {
+export const GET = withErrorHandling(withAuth(async (req: AuthenticatedRequest) => {
   const { searchParams } = new URL(req.url);
   const params = Object.fromEntries(searchParams.entries());
 
@@ -27,13 +29,14 @@ export const GET = withErrorHandling(async (req: NextRequest) => {
 
   const projects = await projectService.listProjects(parsed.data);
   return NextResponse.json(projects);
-});
+}));
 
 /**
  * POST /api/projects
  * Creates a new project after validating the request body.
+ * Requires authentication. Sets ownerId to current user.
  */
-export const POST = withErrorHandling(async (req: NextRequest) => {
+export const POST = withErrorHandling(withAuth(async (req: AuthenticatedRequest) => {
   const body = await req.json().catch(() => null);
   if (!body) {
     throw new ValidationError("Request body is invalid or missing");
@@ -50,6 +53,6 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     );
   }
 
-  const project = await projectService.createProject(parsed.data);
+  const project = await projectService.createProject(parsed.data, req.user.id);
   return NextResponse.json(project, { status: 201 });
-});
+}));

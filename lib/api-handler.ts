@@ -4,6 +4,8 @@ import {
   AppError,
   ValidationError,
   TransitionError,
+  UnauthorizedError,
+  ForbiddenError,
 } from "@/lib/errors";
 
 export interface RouteContext {
@@ -37,6 +39,9 @@ export function withErrorHandling(
           body.attemptedStatus = error.attemptedStatus;
           body.allowedTransitions = error.allowedTransitions;
         }
+
+        // UnauthorizedError and ForbiddenError are handled by the generic AppError block above
+        // (no additional fields required)
 
         return NextResponse.json(body, { status: error.statusCode });
       }

@@ -5,6 +5,8 @@ import {
   NotFoundError,
   ConflictError,
   TransitionError,
+  UnauthorizedError,
+  ForbiddenError,
 } from "@/lib/errors";
 
 describe("lib/errors", () => {
@@ -80,6 +82,48 @@ describe("lib/errors", () => {
       expect(error.message).toBe(
         "Cannot transition from 'Completed' to 'Planned'. Allowed transitions: none"
       );
+    });
+  });
+
+  describe("UnauthorizedError", () => {
+    it("should have statusCode 401 and correct errorType", () => {
+      const error = new UnauthorizedError();
+      expect(error.statusCode).toBe(401);
+      expect(error.errorType).toBe("UnauthorizedError");
+      expect(error.message).toBe("Authentication required");
+    });
+
+    it("should accept a custom message", () => {
+      const error = new UnauthorizedError("Token expired");
+      expect(error.message).toBe("Token expired");
+    });
+
+    it("should be an instance of AppError and Error", () => {
+      const error = new UnauthorizedError();
+      expect(error).toBeInstanceOf(AppError);
+      expect(error).toBeInstanceOf(Error);
+    });
+  });
+
+  describe("ForbiddenError", () => {
+    it("should have statusCode 403 and correct errorType", () => {
+      const error = new ForbiddenError();
+      expect(error.statusCode).toBe(403);
+      expect(error.errorType).toBe("ForbiddenError");
+      expect(error.message).toBe(
+        "You do not have permission to perform this action"
+      );
+    });
+
+    it("should accept a custom message", () => {
+      const error = new ForbiddenError("Admin access required");
+      expect(error.message).toBe("Admin access required");
+    });
+
+    it("should be an instance of AppError and Error", () => {
+      const error = new ForbiddenError();
+      expect(error).toBeInstanceOf(AppError);
+      expect(error).toBeInstanceOf(Error);
     });
   });
 });

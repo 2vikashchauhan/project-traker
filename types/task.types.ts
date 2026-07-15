@@ -13,6 +13,7 @@ export interface Task {
   dueDate: string | null;
   assignedTo: string | null;
   projectId: string;
+  createdById?: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -35,6 +36,7 @@ export interface CreateTaskInput {
   dueDate?: string;
   assignedTo?: string | null;
   projectId: string;
+  createdById?: string | null;
 }
 
 /**

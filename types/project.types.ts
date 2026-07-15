@@ -13,6 +13,7 @@ export interface Project {
   startDate: string | null;
   dueDate: string | null;
   progress: number;
+  ownerId: string | null;
   createdAt: string;
   updatedAt: string;
 }

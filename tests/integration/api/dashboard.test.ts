@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
+// Mock the auth function to return a valid session
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn().mockResolvedValue({
+    user: {
+      id: "user-123",
+      email: "test@example.com",
+      name: "Test User",
+      role: "Admin",
+    },
+  }),
+}));
+
 // Mock the repository modules before importing the route
 vi.mock("@/repositories/project.repository", () => ({
   projectRepository: {

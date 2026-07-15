@@ -41,6 +41,7 @@ describe("TaskRepository", () => {
     dueDate: new Date("2024-06-15"),
     assignedTo: "Alice",
     projectId: "project-uuid-1",
+    createdById: null,
     createdAt: new Date("2024-01-01T00:00:00Z"),
     updatedAt: new Date("2024-01-02T00:00:00Z"),
   };
@@ -78,6 +79,7 @@ describe("TaskRepository", () => {
         dueDate: new Date("2024-06-15").toISOString(),
         assignedTo: "Alice",
         projectId: "project-uuid-1",
+        createdById: null,
         createdAt: new Date("2024-01-01T00:00:00Z").toISOString(),
         updatedAt: new Date("2024-01-02T00:00:00Z").toISOString(),
       });
@@ -222,6 +224,7 @@ describe("TaskRepository", () => {
           dueDate: new Date("2024-06-15"),
           assignedTo: "Alice",
           projectId: "project-uuid-1",
+          createdById: null,
         },
       });
       expect(result.id).toBe("task-uuid-1");
@@ -245,6 +248,7 @@ describe("TaskRepository", () => {
           dueDate: null,
           assignedTo: null,
           projectId: "project-uuid-1",
+          createdById: null,
         },
       });
     });

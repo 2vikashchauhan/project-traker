@@ -6,6 +6,18 @@ vi.mock("@/lib/prisma", () => ({
   prisma: {},
 }));
 
+// Mock the auth function to return a valid session by default
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn().mockResolvedValue({
+    user: {
+      id: "user-123",
+      email: "test@example.com",
+      name: "Test User",
+      role: "Admin",
+    },
+  }),
+}));
+
 // Mock the project repository
 vi.mock("@/repositories/project.repository", () => {
   const mockRepo = {
@@ -48,7 +60,7 @@ const mockRepo = projectRepository as unknown as {
 
 // Helper: create a NextRequest for a given URL
 function createRequest(url: string, options?: RequestInit): NextRequest {
-  return new NextRequest(new URL(url, "http://localhost:3000"), options);
+  return new NextRequest(new URL(url, "http://localhost:3000"), options as any);
 }
 
 // Helper: create a NextRequest with JSON body
@@ -77,6 +89,7 @@ const sampleProject: Project = {
   startDate: "2024-01-01T00:00:00.000Z",
   dueDate: "2024-06-01T00:00:00.000Z",
   progress: 0,
+  ownerId: "user-123",
   createdAt: "2024-01-01T00:00:00.000Z",
   updatedAt: "2024-01-01T00:00:00.000Z",
 };

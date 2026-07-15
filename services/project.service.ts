@@ -38,8 +38,9 @@ export class ProjectService {
   /**
    * Create a new project with default status "Planned" and progress 0.
    * Any provided status or progress values in the input are overridden.
+   * Optionally sets the ownerId for resource ownership tracking.
    */
-  async createProject(data: CreateProjectInput): Promise<Project> {
+  async createProject(data: CreateProjectInput, ownerId?: string): Promise<Project> {
     return this.repository.create({
       name: data.name,
       description: data.description,
@@ -48,6 +49,7 @@ export class ProjectService {
       dueDate: data.dueDate,
       status: "Planned",
       progress: 0,
+      ownerId: ownerId ?? null,
     });
   }
 

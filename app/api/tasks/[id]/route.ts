@@ -1,9 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { withErrorHandling, RouteContext } from "@/lib/api-handler";
+import { withAuth, AuthenticatedRequest } from "@/lib/auth-helpers";
+import { canPerformAction } from "@/lib/permissions";
 import { taskService } from "@/services/task.service";
 import { updateTaskSchema } from "@/validators/task.validator";
 import { uuidSchema } from "@/validators/common.validator";
-import { ValidationError } from "@/lib/errors";
+import { ValidationError, ForbiddenError } from "@/lib/errors";
+import { Role } from "@prisma/client";
 
 /**
  * Validates and extracts the task ID from route params.
@@ -22,19 +25,34 @@ async function validateId(ctx: RouteContext): Promise<string> {
 /**
  * GET /api/tasks/:id
  * Retrieves a single task by ID.
+ * Requires authentication.
  */
-export const GET = withErrorHandling(async (req: NextRequest, ctx: RouteContext) => {
+export const GET = withErrorHandling(withAuth(async (req: AuthenticatedRequest, ctx: RouteContext) => {
   const id = await validateId(ctx);
   const task = await taskService.getTaskById(id);
   return NextResponse.json(task);
-});
+}));
 
 /**
  * PUT /api/tasks/:id
  * Updates an existing task. Validates both the ID and request body.
+ * Requires authentication. Enforces ownership check for Members.
  */
-export const PUT = withErrorHandling(async (req: NextRequest, ctx: RouteContext) => {
+export const PUT = withErrorHandling(withAuth(async (req: AuthenticatedRequest, ctx: RouteContext) => {
   const id = await validateId(ctx);
+
+  // Fetch task to check ownership
+  const existingTask = await taskService.getTaskById(id);
+
+  // Check permissions
+  const allowed = canPerformAction("update", "task", {
+    userRole: req.user.role as Role,
+    userId: req.user.id,
+    resourceOwnerId: existingTask.createdById,
+  });
+  if (!allowed) {
+    throw new ForbiddenError();
+  }
 
   let body: unknown;
   try {
@@ -58,14 +76,29 @@ export const PUT = withErrorHandling(async (req: NextRequest, ctx: RouteContext)
 
   const task = await taskService.updateTask(id, parsed.data);
   return NextResponse.json(task);
-});
+}));
 
 /**
  * DELETE /api/tasks/:id
  * Deletes a task by ID. Returns the deleted task's ID.
+ * Requires authentication. Enforces ownership check for Members.
  */
-export const DELETE = withErrorHandling(async (req: NextRequest, ctx: RouteContext) => {
+export const DELETE = withErrorHandling(withAuth(async (req: AuthenticatedRequest, ctx: RouteContext) => {
   const id = await validateId(ctx);
+
+  // Fetch task to check ownership
+  const existingTask = await taskService.getTaskById(id);
+
+  // Check permissions
+  const allowed = canPerformAction("delete", "task", {
+    userRole: req.user.role as Role,
+    userId: req.user.id,
+    resourceOwnerId: existingTask.createdById,
+  });
+  if (!allowed) {
+    throw new ForbiddenError();
+  }
+
   const result = await taskService.deleteTask(id);
   return NextResponse.json(result);
-});
+}));

@@ -6,6 +6,8 @@ import {
   NotFoundError,
   ConflictError,
   TransitionError,
+  UnauthorizedError,
+  ForbiddenError,
 } from "@/lib/errors";
 import { Prisma } from "@prisma/client";
 
@@ -95,6 +97,60 @@ describe("lib/api-handler - withErrorHandling", () => {
     expect(body.currentStatus).toBe("Planned");
     expect(body.attemptedStatus).toBe("Completed");
     expect(body.allowedTransitions).toEqual(["In Progress", "Cancelled"]);
+  });
+
+  it("should handle UnauthorizedError (401)", async () => {
+    const handler = vi.fn().mockRejectedValue(new UnauthorizedError());
+    const wrapped = withErrorHandling(handler);
+
+    const response = await wrapped(createMockRequest(), createMockContext());
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.error).toBe("UnauthorizedError");
+    expect(body.message).toBe("Authentication required");
+  });
+
+  it("should handle UnauthorizedError with custom message (401)", async () => {
+    const handler = vi.fn().mockRejectedValue(
+      new UnauthorizedError("Token expired")
+    );
+    const wrapped = withErrorHandling(handler);
+
+    const response = await wrapped(createMockRequest(), createMockContext());
+    const body = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(body.error).toBe("UnauthorizedError");
+    expect(body.message).toBe("Token expired");
+  });
+
+  it("should handle ForbiddenError (403)", async () => {
+    const handler = vi.fn().mockRejectedValue(new ForbiddenError());
+    const wrapped = withErrorHandling(handler);
+
+    const response = await wrapped(createMockRequest(), createMockContext());
+    const body = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(body.error).toBe("ForbiddenError");
+    expect(body.message).toBe(
+      "You do not have permission to perform this action"
+    );
+  });
+
+  it("should handle ForbiddenError with custom message (403)", async () => {
+    const handler = vi.fn().mockRejectedValue(
+      new ForbiddenError("Admin access required")
+    );
+    const wrapped = withErrorHandling(handler);
+
+    const response = await wrapped(createMockRequest(), createMockContext());
+    const body = await response.json();
+
+    expect(response.status).toBe(403);
+    expect(body.error).toBe("ForbiddenError");
+    expect(body.message).toBe("Admin access required");
   });
 
   it("should handle PrismaClientKnownRequestError P2002 as 409 Conflict", async () => {

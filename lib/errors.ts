@@ -33,6 +33,24 @@ export class NotFoundError extends AppError {
   }
 }
 
+export class UnauthorizedError extends AppError {
+  statusCode = 401;
+  errorType = "UnauthorizedError";
+
+  constructor(message: string = "Authentication required") {
+    super(message);
+  }
+}
+
+export class ForbiddenError extends AppError {
+  statusCode = 403;
+  errorType = "ForbiddenError";
+
+  constructor(message: string = "You do not have permission to perform this action") {
+    super(message);
+  }
+}
+
 export class ConflictError extends AppError {
   statusCode = 409;
   errorType = "ConflictError";
