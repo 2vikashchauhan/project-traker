@@ -250,6 +250,37 @@ This document records the prompts and interactions used during the spec-driven d
 
 ---
 
+## Prompt 16: Submission Repository Structure
+
+**Date:** July 15, 2026  
+**Type:** Documentation / Submission
+
+**Prompt:**
+
+> Create the required repository structure for ai-practical-assessment submission with all artifacts (candidate-info, requirements-analysis, acceptance-criteria, implementation-plan, design-notes, api-contract, data-model, ui-flow, test-strategy, test-results, debugging-notes, code-review-notes, review-fixes, pr-description, reflection, final-ai-usage-summary, ai-prompts, and tool-specific/kiro-specs).
+
+**Outcome:** Created the complete submission repository at `/home/vikash/ai-practical-assessment/` with 30+ files following the required structure:
+- Root documentation files (README, candidate-info, requirements-analysis, acceptance-criteria, implementation-plan, design-notes, api-contract, data-model, ui-flow, test-strategy, test-results, debugging-notes, code-review-notes, review-fixes, pr-description, reflection, final-ai-usage-summary, tool-workflow)
+- `database/` — schema.prisma, seed-data.sql, setup-notes.md
+- `ai-prompts/` — planning.md, design.md, implementation.md, testing.md, debugging.md, code-review.md, documentation.md
+- `tool-specific/kiro-specs/` — Copied project-tracker and auth-system spec files (requirements, design, tasks) plus hooks
+- `src/` and `tests/` — README references to the Dashboard project source code
+
+---
+
+## Prompt 17: Move Submission Folder into Dashboard
+
+**Date:** July 15, 2026  
+**Type:** File Organization
+
+**Prompt:**
+
+> this file created in dashboard
+
+**Outcome:** Moved the `ai-practical-assessment/` submission folder from `/home/vikash/ai-practical-assessment/` into the Dashboard project at `/home/vikash/Dashboard/ai-practical-assessment/` so it's visible in the Kiro IDE file explorer.
+
+---
+
 ## Summary
 
 | Step | Action | Output |
@@ -270,6 +301,8 @@ This document records the prompts and interactions used during the spec-driven d
 | 14 | Database viewing commands | Prisma Studio + psql + SQL queries reference |
 | 15 | Auth system Quick Spec | requirements.md + design.md + tasks.md for auth-system |
 | 16 | Auth system task execution | Full auth implementation (590 tests passing) |
+| 17 | Submission repository | ai-practical-assessment/ with 30+ artifacts |
+| 18 | Move submission into Dashboard | ai-practical-assessment/ visible in IDE |
 
 ---
 
@@ -280,6 +313,7 @@ This document records the prompts and interactions used during the spec-driven d
 - [x] Generate tasks.md (implementation task list)
 - [x] Implement all tasks
 - [x] Execute all auth-system spec tasks
+- [x] Create submission repository structure
 - [ ] Install and start PostgreSQL locally
 - [ ] Run `npx prisma migrate deploy` to create tables
 - [ ] Run `npm run dev` and verify the dashboard loads without errors

@@ -1,0 +1,13 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Update Prompt History",
+      "trigger": "Stop",
+      "action": {
+        "type": "agent",
+        "prompt": "Append a new entry to /home/vikash/Dashboard/prompt-history.md documenting the task that was just completed in this session. Follow the existing format: a new '## Prompt N: <short title>' section with the current Date, a Type, the user's Prompt quoted with a blockquote, and an Outcome describing what was done. Increment the prompt number based on the last entry. Also add a corresponding row to the Summary table. Do NOT duplicate an entry that already exists for the same prompt. If no meaningful task was performed (e.g., a pure question with no file changes), skip the update."
+      }
+    }
+  ]
+}

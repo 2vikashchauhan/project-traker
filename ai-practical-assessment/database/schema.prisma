@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectStatus {
+  Planned
+  InProgress @map("In Progress")
+  Completed
+  OnHold     @map("On Hold")
+  Cancelled
+}
+
+enum TaskStatus {
+  Todo
+  InProgress @map("In Progress")
+  Review
+  Done
+}
+
+enum Priority {
+  Low
+  Medium
+  High
+}
+
+enum Role {
+  Admin
+  Manager
+  Member
+}
+
+model User {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique @db.VarChar(255)
+  name           String    @db.VarChar(100)
+  hashedPassword String    @db.VarChar(255)
+  role           Role      @default(Member)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  projects       Project[]
+  tasks          Task[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String        @id @default(uuid()) @db.Uuid
+  name        String        @db.VarChar(255)
+  description String?       @db.VarChar(2000)
+  status      ProjectStatus @default(Planned)
+  priority    Priority
+  startDate   DateTime?     @db.Date
+  dueDate     DateTime?     @db.Date
+  progress    Int           @default(0)
+  ownerId     String?       @db.Uuid
+  owner       User?         @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  tasks       Task[]
+
+  @@index([ownerId])
+  @@map("projects")
+}
+
+model Task {
+  id          String     @id @default(uuid()) @db.Uuid
+  title       String     @db.VarChar(255)
+  description String?    @db.VarChar(2000)
+  status      TaskStatus @default(Todo)
+  priority    Priority
+  dueDate     DateTime?  @db.Date
+  assignedTo  String?    @db.VarChar(100)
+  projectId   String     @db.Uuid
+  project     Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdById String?    @db.Uuid
+  createdBy   User?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([createdById])
+  @@map("tasks")
+}
